@@ -1,0 +1,17 @@
+secret_key: "JeFvgCrMuvkoAJjkHgyaMDxku"
+
+app:
+  env: "development"
+  rest:
+    country:
+      url: "https://restcountries.eu/rest/v2/alpha/"
+    currency:
+      url: "http://data.fixer.io/api/latest"
+      token: "61929e98f92d3f004f5805183a8a5c7a"
+    geolocalization:
+      url: "https://api.ip2country.info/ip"
+
+redis_cache:
+  addrs: ":6379"
+  password: ""
+  db: 0
