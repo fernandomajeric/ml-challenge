@@ -42,7 +42,7 @@ Distancia estimada: 10270 kms (-34, -64) a (40, -4)
 
 *Requisitos:* Se debe tener instalado docker (docker-compose)
 
-1. Ejecutar el siguiente comando para clonar el proyecto: `git clone https://github.com/fernandomajeric/mutant-recruiter.git`
+1. Ejecutar el siguiente comando para clonar el proyecto: `https://github.com/fernandomajeric/ml-challenge.git`
 2. Ejecutar `docker-compose build`
 3. Luego `docker-compose up`
 
