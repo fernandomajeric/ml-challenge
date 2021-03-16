@@ -15,14 +15,13 @@ contextual del lugar de origen detectado en el momento de comprar, buscar y paga
 
 Construir una aplicación que dada una dirección IP, encuentre el país al que pertenece, y muestre:
 
-- - El nombre y código ISO del país
-- - Los idiomas oficiales del país
-- - Hora(s) actual(es) en el país (si el país cubre más de una zona horaria, mostrar todas)
-- - Distancia estimada entre Buenos Aires y el país, en km.
-- - Moneda local, y su cotización actual en dólares (si está disponible)
+- El nombre y código ISO del país
+- Los idiomas oficiales del país
+- Hora(s) actual(es) en el país (si el país cubre más de una zona horaria, mostrar todas)
+- Distancia estimada entre Buenos Aires y el país, en km.
+- Moneda local, y su cotización actual en dólares (si está disponible)
 
-Basado en la información anterior, es necesario contar con un mecanismo para poder consultar las siguientes
-  estadísticas de utilización del servicio con los siguientes agregados
+Basado en la información anterior, es necesario contar con un mecanismo para poder consultar las siguientes estadísticas de utilización del servicio con los siguientes agregados
 - Distancia más lejana a Buenos Aires desde la cual se haya consultado el servicio
 - Distancia más cercana a Buenos Aires desde la cual se haya consultado el servicio
 - Distancia promedio de todas las ejecuciones que se hayan hecho del servicio.
@@ -43,8 +42,7 @@ Distancia estimada: 10270 kms (-34, -64) a (40, -4)
 
 *Requisitos:* Se debe tener instalado docker (docker-compose)
 
-1. Ejecutar el siguiente comando para clonar el proyecto:
-   `git clone https://github.com/fernandomajeric/mutant-recruiter.git`
+1. Ejecutar el siguiente comando para clonar el proyecto: `git clone https://github.com/fernandomajeric/mutant-recruiter.git`
 2. Ejecutar `docker-compose build`
 3. Luego `docker-compose up`
 
@@ -52,11 +50,13 @@ Distancia estimada: 10270 kms (-34, -64) a (40, -4)
 
 #### Estadisticas de los servicios
 
-Obtiene las estadisticas de utilizacion de los servicios (pais, distancia mas proxima a bs as , invocaciones y distancia promedio)
+Obtiene las estadisticas de utilizacion de los servicios (pais, distancia mas proxima a bs as , invocaciones y distancia promedio) 
+
 `- curl -X GET \ http://localhost:8080/statistics \ -H 'cache-control: no-cache' \ -H 'postman-token: aabf9572-de14-06b3-0160-40d0733a8cff'`
 
 #### Traceo de Ip
 Obtiene pais de procedencia, moneda, idioma a traves de una ip valida.
+
 `curl -X GET \ 'https://api.ip2country.info/ip?139.82.0.0=' \ -H 'cache-control: no-cache' \ -H 'postman-token: 8dba2eaa-8eea-4f29-0322-c141f3736969'`
 
 
