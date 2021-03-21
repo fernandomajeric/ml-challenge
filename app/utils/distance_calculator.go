@@ -1,15 +1,28 @@
 package utils
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
-func Calculate(latLng1 []float64, latLng2 []float64) float64 {
+func Calculate(latLng1 []float64, latLng2 []float64) (float64, error) {
+	if len(latLng1) != 2 {
+	  error:= errors.New("invalid latLng1")
+	  return 0, error
+	}
+
+	if len(latLng2) != 2 {
+		error:= errors.New("invalid latLng2")
+		return 0, error
+	}
+
 	lat1 := latLng1[0]
 	lon1 := latLng1[1]
 	lat2 := latLng2[0]
 	lon2 := latLng2[1]
 
 	if lat1 == lat2 && lon1 == lon2 {
-		return 0
+		return 0,nil
 	}
 
 	theta := lon1 - lon2
@@ -18,7 +31,7 @@ func Calculate(latLng1 []float64, latLng2 []float64) float64 {
 	distance = radiansToDegrees(distance)
 	distance = distance * 60 * 1.1515 * 1.609344
 
-	return math.Round(distance)
+	return math.Round(distance),nil
 }
 
 func degreesToRadians(deg float64) float64 {

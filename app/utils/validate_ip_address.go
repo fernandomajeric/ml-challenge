@@ -1,4 +1,4 @@
-// Package model implements utility routines for
+// Package model implements utility routines for services
 package utils
 
 import (
@@ -6,15 +6,16 @@ import (
 	"strings"
 )
 
+//ValidateIpAddress Validate real Ip format
 func ValidateIpAddress(ipAddress string) bool {
-	tokens := strings.Split(ipAddress, ".")
-	if len(tokens) != 4 {
+	fields := strings.Split(ipAddress, ".")
+	if len(fields) != 4 {
 		return false
 	}
 
-	for _, t := range tokens {
-		v, err := strconv.ParseInt(t, 10, 32)
-		if err != nil && (v < 0 || v > 255) {
+	for _, f := range fields {
+		v, err := strconv.ParseInt(f, 10, 32)
+		if (v < 0 || v > 255) || err != nil {
 			return false
 		}
 	}
