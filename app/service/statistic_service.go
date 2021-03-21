@@ -8,22 +8,24 @@ import (
 )
 
 type StatisticServiceInterface interface {
-	IncrementScore(score model.StatisticItem)
+	IncrementScore(score model.StatisticItem) error
 	GetScores() (statistic model.Statistic, err error)
 }
 
-type StatisticService struct{}
-
-func NewStatisticService() *StatisticService {
-	return &StatisticService{}
+type StatisticService struct{
+	Repository repository.StatisticRepositoryInterface
 }
 
-func (StatisticService) IncrementScore(score model.StatisticItem) {
-	repository.StatisticRepository{}.Increment(score)
+func NewStatisticService(repository repository.StatisticRepositoryInterface) *StatisticService {
+	return &StatisticService{Repository: repository}
 }
 
-func (StatisticService) GetScores() (statistic model.Statistic, err error) {
-	scores := repository.StatisticRepository{}.GetScores()
+func (service *StatisticService) IncrementScore(score model.StatisticItem) error {
+	return service.Repository.Increment(score)
+}
+
+func (service *StatisticService) GetScores() (statistic model.Statistic, err error) {
+	scores := service.Repository.GetScores()
 	values := getValues(scores)
 	minScore, _ := getMinValue(values)
 	maxScore, _ := getMaxValue(values)

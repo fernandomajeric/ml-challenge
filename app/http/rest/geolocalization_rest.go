@@ -11,36 +11,45 @@ import (
 )
 
 type GeoLocalizationRestClientInterface interface {
-	Find(ip string) model.GeoLocalization
+	Find(ip string) (model.GeoLocalization, error)
 }
 
-type GeoLocalizationRestClient struct{}
+type GeoLocalizationRestClient struct{
+	Client HttpClient
+}
 
-func (GeoLocalizationRestClient) Find(ip string) model.GeoLocalization {
-	client := &http.Client{}
+func NewGeoLocalizationRestClient(client HttpClient) *GeoLocalizationRestClient {
+	return &GeoLocalizationRestClient{Client: client}
+}
 
+func (geolocalizationRest *GeoLocalizationRestClient) Find(ip string) (model.GeoLocalization,error) {
 	req, err := http.NewRequest("GET", config.Configuration.App.Rest.Geolocalization.Url+"?"+ip, nil)
 
 	if err != nil {
 		log.Error(err.Error())
+		return model.GeoLocalization{}, err
 	}
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
+	resp, err := geolocalizationRest.Client.Do(req)
+
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Error(err.Error())
+		return model.GeoLocalization{}, err
 	}
 
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Print(err.Error())
+		fmt.Errorf(err.Error())
+		return model.GeoLocalization{}, err
 	}
+
 	var responseObject model.GeoLocalization
 	json.Unmarshal(bodyBytes, &responseObject)
 	fmt.Printf("Geolocalization Response as struct %+v\n", responseObject)
 
-	return responseObject
+	return responseObject,nil
 
 }

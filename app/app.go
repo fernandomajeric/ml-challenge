@@ -2,6 +2,8 @@ package app
 
 import (
 	"github.com/fernandomajeric/ml-challenge/app/controller"
+	"github.com/fernandomajeric/ml-challenge/app/http/rest"
+	"github.com/fernandomajeric/ml-challenge/app/repository"
 	"github.com/fernandomajeric/ml-challenge/app/service"
 	"github.com/fernandomajeric/ml-challenge/config"
 	"github.com/gorilla/mux"
@@ -38,19 +40,22 @@ func (app *ApiApplication) Start(serverPort string) {
 	traceIpService, statisticService := getServices()
 
 	//Get Controller
-	controller := controller.BuildController(traceIpService, statisticService)
+	controller := controller.NewController(traceIpService, statisticService)
 
 	//Api Routing map
 	myRouter.HandleFunc("/", controller.Home)
-	myRouter.HandleFunc("/trace-ip/{ip}", controller.GetTraceIp).Methods("GET")
-	myRouter.HandleFunc("/statistics", controller.GetStatistics).Methods("GET")
+	myRouter.HandleFunc("/trace-ip/{ip}", controller.GetTraceIp).Methods(http.MethodGet)
+	myRouter.HandleFunc("/statistics", controller.GetStatistics).Methods(http.MethodGet)
 
 	log.Info("Server Started at http://localhost:" + serverPort)
 	log.Fatal(http.ListenAndServe(":"+serverPort, myRouter))
 }
 
 func getServices() (m service.TraceIpServiceInterface, s service.StatisticServiceInterface) {
-	traceIpService := service.NewTraceIpService()
-	statisticService := service.NewStatisticService()
+	traceIpService := service.NewTraceIpService(rest.NewGeoLocalizationRestClient(rest.Client),
+		rest.NewCountryRestClient(rest.Client),
+		rest.NewCurrencyRateRestClient(rest.Client))
+
+	statisticService := service.NewStatisticService(repository.NewStatisticRepository())
 	return traceIpService, statisticService
 }

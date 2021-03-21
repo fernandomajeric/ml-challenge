@@ -16,6 +16,10 @@ type StatisticRepositoryInterface interface {
 
 type StatisticRepository struct{}
 
+func NewStatisticRepository() *StatisticRepository {
+	return &StatisticRepository{}
+}
+
 func (StatisticRepository) GetScores() map[string]model.StatisticCore {
 	ctx := context.Background()
 	rdb := redis.NewClient(&redis.Options{

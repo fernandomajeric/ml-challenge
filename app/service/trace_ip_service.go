@@ -14,32 +14,55 @@ import (
 type TraceIpServiceInterface interface {
 	GetTraceIp(ip string) (result model.TraceIpResult, err error)
 }
-type TraceIpService struct{}
-
-// New : build new Service
-func NewTraceIpService() TraceIpServiceInterface {
-	return &TraceIpService{}
+type TraceIpService struct {
+	GeoLocalizationRestClient rest.GeoLocalizationRestClientInterface
+	CountryRestClient         rest.CountryRestClientInterface
+	CurrencyRateRestClient    rest.CurrencyRateRestClientInterface
 }
 
-func (TraceIpService) GetTraceIp(ip string) (result model.TraceIpResult, err error) {
+func NewTraceIpService(geoLocalizationRestClient rest.GeoLocalizationRestClientInterface,
+	countryRestClient rest.CountryRestClientInterface,
+	currencyRateRestClient rest.CurrencyRateRestClientInterface) *TraceIpService {
+	return &TraceIpService{GeoLocalizationRestClient: geoLocalizationRestClient,
+		CountryRestClient:      countryRestClient,
+		CurrencyRateRestClient: currencyRateRestClient}
+}
+
+func (traceIp *TraceIpService) GetTraceIp(ip string) (result model.TraceIpResult, err error) {
 	if !utils.ValidateIpAddress(ip) {
-		return model.TraceIpResult{}, errors.New("format incorrecto!")
+		return model.TraceIpResult{}, errors.New("invalid ip address!")
 	}
 
-	geoLocalization := rest.GeoLocalizationRestClient{}.Find(ip)
+	geoLocalization, err := traceIp.GeoLocalizationRestClient.Find(ip)
+
+	if err != nil {
+		return model.TraceIpResult{}, err
+	}
 
 	if !validateGeolocalization(geoLocalization) {
-		return model.TraceIpResult{}, errors.New("Invalid Ip")
+		return model.TraceIpResult{}, errors.New("invalid ip address!")
 	}
 
-	fmt.Printf("CountryCode: ", geoLocalization.CountryCode)
-	country := rest.CountryRestClient{}.Find(geoLocalization.CountryCode)
+	country, err := traceIp.CountryRestClient.Find(geoLocalization.CountryCode)
+
+	if err != nil {
+		return model.TraceIpResult{}, err
+	}
+
+	if len(country.Currencies) == 0 {
+		return model.TraceIpResult{}, errors.New(fmt.Sprintf("Currencies for country %s",country.Name))
+	}
 
 	currencyCode := country.Currencies[0].Code
-	currencyRate := rest.CurrencyRateRestClient{}.Find(currencyCode)
+	currencyRate,err := traceIp.CurrencyRateRestClient.Find(currencyCode)
+
+	if err != nil {
+		return model.TraceIpResult{}, err
+	}
+
 	currencyDescription := getCurrencyDescription(currencyCode, currencyRate)
 	languageDescription := getLanguageDescription(country)
-	distance := getDistance(country)
+	distance, err := traceIp.getDistance(country)
 
 	result = model.TraceIpResult{
 		Ip:       ip,
@@ -54,8 +77,13 @@ func (TraceIpService) GetTraceIp(ip string) (result model.TraceIpResult, err err
 	return result, err
 }
 
-func getDistance(country model.Country) float64 {
-	localCountry := rest.CountryRestClient{}.Find("AR")
+func (traceIp *TraceIpService) getDistance(country model.Country) (float64, error) {
+	localCountry,err := traceIp.CountryRestClient.Find(utils.ArgCode)
+
+	if err != nil {
+		return 0, err
+	}
+
 	return utils.Calculate(localCountry.Latlng, country.Latlng)
 }
 

@@ -11,35 +11,44 @@ import (
 )
 
 type CountryRestClientInterface interface {
-	Find(code string) model.Country
+	Find(code string) (model.Country, error)
 }
 
-type CountryRestClient struct{}
+type CountryRestClient struct{
+	Client HttpClient
+}
 
-func (CountryRestClient) Find(code string) model.Country {
-	client := &http.Client{}
+func NewCountryRestClient(client HttpClient) *CountryRestClient {
+	return &CountryRestClient{Client: client}
+}
 
+//Find information by iso code
+func (countryClient *CountryRestClient) Find(code string) (model.Country, error) {
 	req, err := http.NewRequest("GET", config.Configuration.App.Rest.Country.Url+code, nil)
 
 	if err != nil {
 		log.Error(err.Error())
+		return model.Country{}, err
 	}
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
+	resp, err := countryClient.Client.Do(req)
+
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Error(err.Error())
+		return model.Country{}, err
 	}
 
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Error(err.Error())
+		return model.Country{}, err
 	}
 	var responseObject model.Country
 	json.Unmarshal(bodyBytes, &responseObject)
 	fmt.Printf("Country Response as struct %+v\n", responseObject)
 
-	return responseObject
+	return responseObject, nil
 }

@@ -11,18 +11,23 @@ import (
 )
 
 type CurrencyRateRestClientInterface interface {
-	Find(code string) model.CurrencyRate
+	Find(code string) (model.CurrencyRate, error)
 }
 
-type CurrencyRateRestClient struct{}
+type CurrencyRateRestClient struct{
+	Client HttpClient
+}
 
-func (CurrencyRateRestClient) Find(code string) model.CurrencyRate {
-	client := &http.Client{}
+func NewCurrencyRateRestClient(client HttpClient) *CurrencyRateRestClient {
+	return &CurrencyRateRestClient{Client: client}
+}
 
+func (currencyRateRest *CurrencyRateRestClient) Find(code string) (model.CurrencyRate,error) {
 	req, err := http.NewRequest("GET", config.Configuration.App.Rest.Currency.Url, nil)
 
 	if err != nil {
 		log.Error(err.Error())
+		return model.CurrencyRate{}, err
 	}
 
 	req.Header.Add("Accept", "application/json")
@@ -32,20 +37,23 @@ func (CurrencyRateRestClient) Find(code string) model.CurrencyRate {
 	q.Add("symbols", code)
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := client.Do(req)
+	resp, err := currencyRateRest.Client.Do(req)
 
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Error(err.Error())
+		return model.CurrencyRate{}, err
 	}
 
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
+
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Error(err.Error())
+		return model.CurrencyRate{}, err
 	}
 	var responseObject model.CurrencyRate
 	json.Unmarshal(bodyBytes, &responseObject)
 	fmt.Printf("CurrencyCore Response as struct %+v\n", responseObject)
 
-	return responseObject
+	return responseObject,nil
 }

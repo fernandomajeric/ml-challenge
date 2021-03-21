@@ -20,7 +20,7 @@ type GenericController struct {
 	StatisticService service.StatisticServiceInterface
 }
 
-func BuildController(traceIpService service.TraceIpServiceInterface, statisticService service.StatisticServiceInterface) Controller {
+func NewController(traceIpService service.TraceIpServiceInterface, statisticService service.StatisticServiceInterface) Controller {
 	return &GenericController{
 		TraceIpService:   traceIpService,
 		StatisticService: statisticService,
@@ -31,9 +31,11 @@ func (controller *GenericController) GetTraceIp(w http.ResponseWriter, r *http.R
 	params := mux.Vars(r)
 	ip := params["ip"]
 	fmt.Println("Params: ", ip)
+
 	result, err := controller.TraceIpService.GetTraceIp(ip)
 
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, err.Error())
 	} else {
 		json.NewEncoder(w).Encode(result)
@@ -41,7 +43,6 @@ func (controller *GenericController) GetTraceIp(w http.ResponseWriter, r *http.R
 			CountryName: result.Country,
 			Distance:    result.Distance,
 		}
-
 		controller.StatisticService.IncrementScore(statisticItem)
 	}
 }
@@ -60,7 +61,7 @@ func (controller *GenericController) GetStatistics(w http.ResponseWriter, r *htt
 	}
 }
 
-// Home Muestra un mensaje
+// Home
 func (controller *GenericController) Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to my Api")
 }
