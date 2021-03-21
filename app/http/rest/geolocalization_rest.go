@@ -23,7 +23,7 @@ func NewGeoLocalizationRestClient(client HttpClient) *GeoLocalizationRestClient 
 }
 
 func (geolocalizationRest *GeoLocalizationRestClient) Find(ip string) (model.GeoLocalization,error) {
-	req, err := http.NewRequest("GET", config.Configuration.App.Rest.Geolocalization.Url+"?"+ip, nil)
+	req, err := http.NewRequest(http.MethodGet, config.Configuration.App.Rest.Geolocalization.Url+"?"+ip, nil)
 
 	if err != nil {
 		log.Error(err.Error())

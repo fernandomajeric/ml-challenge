@@ -23,7 +23,7 @@ func NewCurrencyRateRestClient(client HttpClient) *CurrencyRateRestClient {
 }
 
 func (currencyRateRest *CurrencyRateRestClient) Find(code string) (model.CurrencyRate,error) {
-	req, err := http.NewRequest("GET", config.Configuration.App.Rest.Currency.Url, nil)
+	req, err := http.NewRequest(http.MethodGet, config.Configuration.App.Rest.Currency.Url, nil)
 
 	if err != nil {
 		log.Error(err.Error())

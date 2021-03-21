@@ -15,11 +15,8 @@ var ctx = context.Background()
 
 func main() {
 	var configFilePath string
-	var serverPort = os.Getenv("PORT")
-
-	if serverPort == "" {
-		serverPort = "8080"
-	}
+	var serverPort = getEnv("PORT","8080")
+	var redisInstance = getEnv("REDIS_URL","localhost:6379")
 
 	flag.StringVar(&configFilePath, "config", "./", "absolute path to the configuration file")
 	flag.StringVar(&serverPort, "server_port", serverPort, "port on which server runs")
@@ -31,12 +28,16 @@ func main() {
 	config.Configuration.RedisCache.Addrs = getEnv("REDIS_URL", config.Configuration.RedisCache.Addrs)
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     getEnv("REDIS_URL", "localhost:6379"),
+		Addr:     redisInstance,
 		Password: config.Configuration.RedisCache.Password, // no password set
 		DB:       config.Configuration.RedisCache.DB,       // use default DB
 	})
 	pong, err := client.Ping(ctx).Result()
 	fmt.Println(pong, err)
+
+	if err != nil {
+		panic(err)
+	}
 
 	// start http server
 	application.Start(serverPort)

@@ -24,7 +24,7 @@ func NewCountryRestClient(client HttpClient) *CountryRestClient {
 
 //Find information by iso code
 func (countryClient *CountryRestClient) Find(code string) (model.Country, error) {
-	req, err := http.NewRequest("GET", config.Configuration.App.Rest.Country.Url+code, nil)
+	req, err := http.NewRequest(http.MethodGet, config.Configuration.App.Rest.Country.Url+code, nil)
 
 	if err != nil {
 		log.Error(err.Error())

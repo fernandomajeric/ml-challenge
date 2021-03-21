@@ -6,6 +6,7 @@ import (
 	"github.com/fernandomajeric/ml-challenge/app/model"
 	"github.com/fernandomajeric/ml-challenge/app/service"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -35,15 +36,19 @@ func (controller *GenericController) GetTraceIp(w http.ResponseWriter, r *http.R
 	result, err := controller.TraceIpService.GetTraceIp(ip)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, err.Error())
-	} else {
-		json.NewEncoder(w).Encode(result)
-		statisticItem := model.StatisticItem{
-			CountryName: result.Country,
-			Distance:    result.Distance,
-		}
-		controller.StatisticService.IncrementScore(statisticItem)
+		log.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	json.NewEncoder(w).Encode(result)
+	statisticItem := model.StatisticItem{
+		CountryName: result.Country,
+		Distance:    result.Distance,
+	}
+	err = controller.StatisticService.IncrementScore(statisticItem)
+
+	if err != nil {
+		log.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -51,7 +56,8 @@ func (controller *GenericController) GetStatistics(w http.ResponseWriter, r *htt
 	result, err := controller.StatisticService.GetScores()
 
 	if err != nil {
-		fmt.Fprintf(w, err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	} else {
 		if result == (model.Statistic{}) {
 			fmt.Fprintf(w, "empty statistics")
