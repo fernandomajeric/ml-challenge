@@ -52,11 +52,11 @@ Distancia estimada: 10270 kms (-34, -64) a (40, -4)
 
 Obtiene las estadisticas de utilizacion de los servicios (pais, distancia mas proxima a bs as , invocaciones y distancia promedio) 
 
-`- curl -X GET \ http://localhost:8080/statistics \ -H 'cache-control: no-cache' \ -H 'postman-token: aabf9572-de14-06b3-0160-40d0733a8cff'`
+`$ curl -X GET \ 'http://localhost:8080/statistics' \ -H 'accept: application/json'`
 
 #### Traceo de Ip
 Obtiene pais de procedencia, moneda, idioma a traves de una ip valida.
 
-`curl -X GET \ 'http://localhost:8080/trace-ip/139.82.0.0=' \ -H 'cache-control: no-cache' \ -H 'postman-token: 8dba2eaa-8eea-4f29-0322-c141f3736969'`
+`$ curl -X GET \ 'http://localhost:8080/trace-ip/139.82.0.0' \ -H 'accept: application/json'`
 
 
