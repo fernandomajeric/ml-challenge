@@ -57,6 +57,6 @@ Obtiene las estadisticas de utilizacion de los servicios (pais, distancia mas pr
 #### Traceo de Ip
 Obtiene pais de procedencia, moneda, idioma a traves de una ip valida.
 
-`curl -X GET \ 'https://api.ip2country.info/ip?139.82.0.0=' \ -H 'cache-control: no-cache' \ -H 'postman-token: 8dba2eaa-8eea-4f29-0322-c141f3736969'`
+`curl -X GET \ 'http://localhost:8080/trace-ip/139.82.0.0=' \ -H 'cache-control: no-cache' \ -H 'postman-token: 8dba2eaa-8eea-4f29-0322-c141f3736969'`
 
 
